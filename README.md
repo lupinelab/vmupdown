@@ -13,12 +13,10 @@ APT:
 
 # Installation:
 - Install requirements:
-apt install apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
-pip3 -m install flask proxmoxer
+<br />apt install apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
+<br />pip3 -m install flask proxmoxer
 - Configure apache2 to listen on port 8080:
-nano /etc/apache2/ports.conf
-Add below line:
-Listen 8080
+<br />Add "Listen 8080" to /etc/apache2/ports.conf
 
 - Copy vmupdown folder into /var/www/html and adjust permissions:<br />
 chown -R www-data:www-data /var/www/html/vmupdown<br />
