@@ -1,5 +1,5 @@
 # vmupdown
-vupdown is my first python project. It provides touchscreen optimised controls though an apache web site for Proxmox VMs & Nodes. Specifically for my use case which is using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
+vupdown is my first python project. It provides touchscreen optimised controls though an apache web site for Proxmox VMs & nodes. Specifically for my use case which is using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
 
 It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend to monitor status and control powering on/off VMs or nodes. It also includes basic detection of conflicts in VFIO pcie devices shared between VMs.
 
