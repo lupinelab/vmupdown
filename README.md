@@ -29,7 +29,7 @@ chmod +x /var/www/html/vmupdown/vmupdown.*
 - Create a proxmox pam user "vmupdown"
 - Create a 'Role' in proxmox called 'vmupdown' and give it the following privileges:
 <br />Sys.PowerMgmt, VM.Audit, VM.PowerMgmt
-- Create 'Permissions' for the paths /nodes and /vms for the user and role above.
+- Create 'Permissions' for both /nodes and /vms for the user and role above.
 - Create and API Token for the vmupdown user. Copy the token into the token variable in vmupdown.py
 - Fill out the rest of the variables at the top of the file with values appropriate to your setup:
   
