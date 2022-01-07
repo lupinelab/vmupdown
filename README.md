@@ -3,7 +3,7 @@ vupdown is my first python project. It provides touchscreen optimised controls t
 
 It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend to monitor status and control powering on/off VMs or nodes. It also includes basic detection of conflicts in VFIO pcie devices shared between VMs.
 
-NB - Various assumptions on deployment platform are made in the below instructions, for reference I have this running on Ubuntu 21.10.
+NB - Various assumptions on deployment platform are made in the below instructions, for reference the below relates to Ubuntu 21.10.
 
 # Requirements:
 APT:
