@@ -3,6 +3,8 @@ vupdown is my first python project. It provides touchscreen optimised controls t
 
 It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend to monitor status and control powering on/off VMs or nodes. It also includes basic detection of conflicts in VFIO pcie devices shared between VMs.
 
+NB - Various assumptions are made in the below, for reference I have this running on Ubuntu 21.10.
+
 Requirements:
 APT:
 apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
@@ -30,6 +32,9 @@ Sys.PowerMgmt, VM.Audit, VM.PowerMgmt
 - Create and API Token for the vmupdown user. Copy the token into the token variable in vmupdown.py
 - Fill out the rest of the variables at the top of the file with values appropriate to your setup:
 
-- nodes - A nested dictionary of nodes, mac addresses & status, e.g. {"proxmoxnode-01": {"mac": "70:85:c2:c7:29:b3", "status": ""}, "proxmoxnode-02": {"mac": "e0:d5:5e:5f:60:c2", "status": ""}}
+- nodes - a nested dictionary of nodes, mac addresses & status, e.g. {"proxmoxnode-01": {"mac": "70:85:c2:c7:29:b3", "status": ""}, "proxmoxnode-02": {"mac": "e0:d5:5e:5f:60:c2", "status": ""}}
 - domain - if using local domain names enter it here including the preceeding ".", e.g. ".lupinelab". Else leave it blank e.g. ""
-sharedgpu - 
+- sharedgpu - the vfio number of your shared gpu, e.g. "0000:13:00"
+
+- Reload apache:
+systemctl reload apache2
