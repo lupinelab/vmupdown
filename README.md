@@ -29,7 +29,7 @@ Sys.PowerMgmt, VM.Audit, VM.PowerMgmt
 - Create 'Permissions' for the paths /nodes and /vms for the user and role above.
 - Create and API Token for the vmupdown user. Copy the token into the token variable in vmupdown.py
 - Fill out the rest of the variables at the top of the file with values appropriate to your setup:
-nodes - The names of each of your proxmox nodes
-nodemac - A dictionary of nodes and mac addresses available for wakeonlan, e.g. {"proxmoxnode-01": "70:85:c2:c7:29:b3", "proxmoxnode-02": "e0:d5:5e:5f:60:c2"}
-domain - if using local domain names enter it here including the preceeding ".", e.g. ".lupinelab". Else leave it blank e.g. ""
+
+- nodes - A nested dictionary of nodes, mac addresses & status, e.g. {"proxmoxnode-01": {"mac": "70:85:c2:c7:29:b3", "status": ""}, "proxmoxnode-02": {"mac": "e0:d5:5e:5f:60:c2", "status": ""}}
+- domain - if using local domain names enter it here including the preceeding ".", e.g. ".lupinelab". Else leave it blank e.g. ""
 sharedgpu - 
