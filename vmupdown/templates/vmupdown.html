@@ -20,29 +20,44 @@
 </head>
 <body>
 <form action="/refresh">
-    <input type="submit" value="Refresh VMs" />
+    <input type="submit" value="Refresh" />
 </form>
 <br>
 <br>
 <form action="/" method="POST" id="form">
     <p>Select GPU enabled VM to start/stop:</p>
     <p>    {%for vm in vms %}
-        {% if vms[vm]["gpu"] == 1 %}
-        <button style="background-color:#d2f3ff; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
+        {% if sharedgpu in vms[vm]["pcie"] %}
+        {% if vms[vm]["status"] == "started" %}
+        <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
+        {% endif %}
+        {% if vms[vm]["status"] == "stopped" %}
+        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
+        {% endif %}
         {% endif %}
         {% endfor %}</p>
 <br>
     <p>Select service VM to start/stop:</p>
     <p>    {%for vm in vms %}
-        {% if vms[vm]["gpu"] == 0 %}
+        {% if not sharedgpu in vms[vm]["pcie"] %}
+        {% if vms[vm]["status"] == "started" %}
         <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
         {% endif %}
-        {% endfor %}</p></p>
+        {% if vms[vm]["status"] == "stopped" %}
+        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
+        {% endif %}
+        {% endif %}
+        {% endfor %}</p>
     <br>
     <p>Select node to start/stop:</p>
     <p>    {%for node in nodes %}
-        <button style="background-color:#ffd7b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{node}}">{{node}}</button>
-        {% endfor %}</p></p>
+        {% if nodes[node]["status"] == "started" %}
+        <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{node}}">{{node}}</button>
+        {% endif %}
+        {% if nodes[node]["status"] == "stopped" %}
+        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{node}}">{{node}}</button>
+        {% endif %}
+        {% endfor %}</p>
 </form>
 </body>
 </html>
