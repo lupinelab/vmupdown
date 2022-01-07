@@ -40,3 +40,5 @@ chmod +x /var/www/html/vmupdown/vmupdown.*
 
 - Reload apache:
 <br />systemctl reload apache2
+
+- You should now be able to load the site on http://serveripaddress:8080
