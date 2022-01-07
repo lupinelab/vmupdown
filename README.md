@@ -6,9 +6,9 @@ It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend
 NB - Various assumptions on deployment platform are made in the below instructions, for reference I have this running on Ubuntu 21.10.
 
 Requirements:
-APT:
+<br />APT:
 <br />apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
-PIP:
+<br />PIP:
 <br />flask proxmoxer
 
 Installation:
