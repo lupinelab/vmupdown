@@ -7,9 +7,9 @@ NB - Various assumptions on deployment platform are made in the below instructio
 
 Requirements:
 APT:
-apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
+<br />apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
 PIP:
-flask proxmoxer
+<br />flask proxmoxer
 
 Installation:
 - Install requirements:
