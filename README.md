@@ -20,8 +20,8 @@ nano /etc/apache2/ports.conf
 Add below line:
 Listen 8080
 
-- Copy vmupdown folder into /var/www/html and adjust permissions:
-chown -R www-data:www-data /var/www/html/vmupdown
+- Copy vmupdown folder into /var/www/html and adjust permissions:<br />
+chown -R www-data:www-data /var/www/html/vmupdown<br />
 chmod +x /var/www/html/vmupdown/vmupdown.*
 
 - Copy vmupdown.conf to /etc/apache2/sites-available and then enable site:
