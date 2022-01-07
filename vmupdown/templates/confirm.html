@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<!-- get the required files from 3rd party sources -->
+      <link href='http://fonts.googleapis.com/css?family=Roboto:wght@100&display=swap rel='stylesheet' type='text/css'>
+
+      <!-- use the font -->
+      <style>
+        body {
+          font-family: 'Roboto', sans-serif;
+          font-size: 16px;
+          color: #ffffff;
+          padding: 15px;
+          text-align: center;
+          background-color: #1f1f1f;
+        }
+      </style>
+<head>
+<title>Lupinelab VM Control</title>
+</head>
+<body>
+<form action="/confirm" method="POST" id="form">
+    <p><b>{{runningvm}}</b> is currently using the GPU... shutdown <b>{{runningvm}}</b> and start <b>{{itemtoaction}}</b>?
+    <input type="submit" value="Ok">
+</p>
+</form>
+<form action="/">
+    <input type="submit" value="Back" />
+</form>
+</body>
+</html>

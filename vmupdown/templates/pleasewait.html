@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<!-- get the required files from 3rd party sources -->
+      <link href='http://fonts.googleapis.com/css?family=Roboto:wght@100&display=swap rel='stylesheet' type='text/css'>
+
+      <!-- use the font -->
+      <style>
+        body {
+          font-family: 'Roboto', sans-serif;
+          font-size: 16px;
+          color: #ffffff;
+          padding: 15px;
+          text-align: center;
+          background-color: #1f1f1f;
+        }
+      </style>
+<head>
+      <script>
+            var request = new XMLHttpRequest();
+request.open('POST', '/pleasewait');
+
+request.onload = function() {
+  if (request.status === 200 && request.responseText === 'done') {
+    // long process finished successfully, redirect user
+    window.location = '/done';
+  } else {
+    // ops, we got an error from the server
+    alert('Something went wrong.');
+  }
+};
+
+request.onerror = function() {
+  // ops, we got an error trying to talk to the server
+  alert('Something went wrong.');
+};
+
+request.send();
+      </script>
+<title>Lupinelab VM Control</title>
+</head>
+<body>
+<p>Shutting down <b>{{runningvm}}</b> and starting <b>{{itemtoaction}}</b>.</p>
+<p>Please wait...</p>
+</body>
+</html>
