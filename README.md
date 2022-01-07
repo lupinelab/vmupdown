@@ -36,7 +36,8 @@ chmod +x /var/www/html/vmupdown/vmupdown.*
 <br />nodes - a nested dictionary of nodes, mac addresses & status:
 <br />e.g. {"proxmoxnode-01": {"mac": "70:85:c2:c7:29:b3", "status": ""}, "proxmoxnode-02": {"mac": "e0:d5:5e:5f:60:c2", "status": ""}}
 <br />NB. "status" should be left blank, e.g. ""
-- sharedgpu - the vfio number of your shared gpu, e.g. "0000:13:00"
+
+sharedgpu - the vfio number of your shared gpu, e.g. "0000:13:00"
 
 - Reload apache:
-systemctl reload apache2
+<br />systemctl reload apache2
