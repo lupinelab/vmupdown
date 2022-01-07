@@ -11,16 +11,16 @@ flask proxmoxer
 
 Installation:
 - Configure apache2 to listen on port 8080:
-# nano /etc/apache2/ports.conf
+nano /etc/apache2/ports.conf
 Add below line:
 Listen 8080
 
 - Copy vmupdown folder into /var/www/html and adjust permissions:
-# chown -R www-data:www-data /var/www/html/vmupdown
-# chmod +x /var/www/html/vmupdown/vmupdown.*
+chown -R www-data:www-data /var/www/html/vmupdown
+chmod +x /var/www/html/vmupdown/vmupdown.*
 
 - Copy vmupdown.conf to /etc/apache2/sites-available and then enable site:
-# a2ensite vmupdown
+a2ensite vmupdown
 
 Configuration:
 - Create a proxmox pam user "vmupdown"
