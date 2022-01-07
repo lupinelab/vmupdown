@@ -5,13 +5,13 @@ It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend
 
 NB - Various assumptions on deployment platform are made in the below instructions, for reference I have this running on Ubuntu 21.10.
 
-Requirements:
+# Requirements:
 <br />APT:
 <br />apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
 <br />PIP:
 <br />flask proxmoxer
 
-Installation:
+# Installation:
 - Install requirements:
 apt install apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
 pip3 -m install flask proxmoxer
@@ -27,7 +27,7 @@ chmod +x /var/www/html/vmupdown/vmupdown.*
 - Copy vmupdown.conf to /etc/apache2/sites-available and then enable site:
 a2ensite vmupdown
 
-Configuration:
+# Configuration:
 - Create a proxmox pam user "vmupdown"
 - Create a 'Role' in proxmox called 'vmupdown' and give it the following privileges:
 Sys.PowerMgmt, VM.Audit, VM.PowerMgmt
