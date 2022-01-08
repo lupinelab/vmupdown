@@ -56,7 +56,7 @@ def startnode(node):
 
 
 def shutdownnode(node):
-    proxmoxer_connection(nodes[node]["ip"]).nodes(node).status.post(command="shutdown")
+    proxmoxer_connection(node).nodes(node).status.post(command="shutdown")
 
 
 def refreshvms():
