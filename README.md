@@ -9,12 +9,12 @@ NB - Various assumptions on deployment platform are made in the below instructio
 APT:
 <br />apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
 <br />PIP:
-<br />flask proxmoxer
+<br />flask proxmoxer requests
 
 # Installation:
 - Install requirements:
 <br />apt install apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
-<br />pip3 -m install flask proxmoxer
+<br />pip3 -m install flask proxmoxer requests
 - Configure apache2 to listen on port 8080:
 <br />Add "Listen 8080" to /etc/apache2/ports.conf
 
