@@ -1,6 +1,8 @@
 # vmupdown
 vmupdown provides simple controls though an apache web site for Proxmox VMs & nodes. Specifically for my use case which is using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
 
+![screenshot-1](images/vmupdown-1.png)
+
 It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend to monitor status and control powering on/off VMs or nodes. It also includes basic detection of conflicts in VFIO pcie devices shared between VMs.
 
 NB - Various assumptions on deployment platform are made in the below instructions, for reference the below relates to Ubuntu 21.10.
