@@ -35,9 +35,11 @@ chmod +x /var/www/html/vmupdown/vmupdown.*
 - Create and API Token for the vmupdown user. Copy the token into the token variable in vmupdown.py
 - Fill out the rest of the variables at the top of the vmupdown.py file with values appropriate to your setup:
   
-  nodes - a nested dictionary of nodes, mac addresses & status (NB. "status" should be left blank):
-  <br />e.g. {"proxmoxnode-01": {"mac": "70:85:c2:c7:29:b3", "status": ""},
-  <br />"proxmoxnode-02": {"mac": "e0:d5:5e:5f:60:c2", "status": ""}
+  nodes - a nested dictionary of nodes, ip addresses, mac addresses & status (NB. "status" should be left blank):
+  <br />e.g.   
+  <br />{
+  <br />"proxmoxnode-01": {"ip": "192.168.20.2", "mac": "70:85:c2:c7:29:b3", "status": ""},
+  <br />"proxmoxnode-02": {"ip": "192.168.20.3", "mac": "e0:d5:5e:5f:60:c2", "status": ""}
   <br />}
 
   sharedgpu - the vfio number of your shared gpu, e.g. "0000:13:00"
