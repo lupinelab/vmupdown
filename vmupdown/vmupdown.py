@@ -48,7 +48,7 @@ class Itemtoaction:
         os.system(command)
 
     def shutdownnode(self):
-        proxmoxer_connection(self.node).nodes(self.node).status.post(command="shutdown")
+        proxmoxer_connection(self.name).nodes(self.name).status.post(command="shutdown")
 
 
 class Runningvm(Itemtoaction):
@@ -159,8 +159,7 @@ def vmupdown():
                             continue
                         else:
                             state = 1
-                            vm = Runningvm(vm)
-                            session['runningvm'] = vm
+                            runningvm = Runningvm(vm)
             if state != 0:
                 return redirect(url_for("confirm"))
             if state == 0:
