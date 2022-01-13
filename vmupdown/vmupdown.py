@@ -112,8 +112,6 @@ def checkallvmstates():
 
 
 def vmdownup():
-    #runningvm = session.get('runningvm', None)
-    #itemtoaction = session.get('itemtoaction', None)
     runningvm.shutdownvm()
     state = 1
     while state == 1:
@@ -138,7 +136,6 @@ def vmupdown():
     if request.method == "POST":
         global itemtoaction, runningvm
         itemtoaction = Itemtoaction(request.form["itemtoaction"])
-        # session['itemtoaction'] = itemtoaction
         state = 0
         if itemtoaction.name in nodes:
             if checknodestate(itemtoaction.name) == "started":
@@ -175,7 +172,6 @@ def vmupdown():
 
 @app.route('/alreadystarted', methods=["GET", "POST"])
 def alreadystarted():
-    #itemtoaction = session.get('itemtoaction', None)
     if request.method == 'GET':
         return render_template('alreadystarted.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
@@ -185,8 +181,6 @@ def alreadystarted():
 
 @app.route('/confirm', methods=["GET", "POST"])
 def confirm():
-    #itemtoaction = session.get('itemtoaction', None)
-    #runningvm = session.get('runningvm', None)
     if request.method == "POST":
         session['action'] = "started"
         return redirect(url_for("pleasewait"))
@@ -196,8 +190,6 @@ def confirm():
 
 @app.route('/pleasewait', methods=["GET", "POST"])
 def pleasewait():
-    #itemtoaction = session.get('itemtoaction', None)
-    #runningvm = session.get('runningvm', None)
     if request.method == 'GET':
         return render_template('pleasewait.html', runningvm=runningvm, itemtoaction=itemtoaction)
     if request.method == 'POST':
@@ -207,7 +199,6 @@ def pleasewait():
 
 @app.route('/starting', methods=["GET", "POST"])
 def starting():
-    #itemtoaction = session.get('itemtoaction', None)
     if request.method == 'GET':
         return render_template('starting.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
@@ -221,7 +212,6 @@ def starting():
 
 @app.route('/shuttingdown', methods=["GET", "POST"])
 def shuttingdown():
-    #itemtoaction = session.get('itemtoaction', None)
     if request.method == 'GET':
         return render_template('shuttingdown.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
@@ -235,7 +225,6 @@ def shuttingdown():
 
 @app.route('/done', methods=["GET", "POST"])
 def done():
-    #itemtoaction = session.get('itemtoaction', None)
     action = session.get('action', None)
     state = 1
     if request.method == 'GET':
@@ -278,8 +267,6 @@ def done():
     if request.method == 'POST':
         sleep(3)
         session.pop('action', None)
-        # session.pop('runningvm', None)
-        # session.pop('itemtoaction', None)
         return 'done'
 
 
