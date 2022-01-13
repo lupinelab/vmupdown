@@ -28,10 +28,10 @@
     <p>Select GPU enabled VM to start/stop:</p>
     <p>    {%for vm in vms %}
         {% if sharedgpu in vms[vm]["pcie"] %}
-        {% if vms[vm]["status"] == "started" %}
+        {% if vms[vm]["state"] == "started" %}
         <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
         {% endif %}
-        {% if vms[vm]["status"] == "stopped" %}
+        {% if vms[vm]["state"] == "stopped" %}
         <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
         {% endif %}
         {% endif %}
@@ -40,10 +40,10 @@
     <p>Select service VM to start/stop:</p>
     <p>    {%for vm in vms %}
         {% if not sharedgpu in vms[vm]["pcie"] %}
-        {% if vms[vm]["status"] == "started" %}
+        {% if vms[vm]["state"] == "started" %}
         <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
         {% endif %}
-        {% if vms[vm]["status"] == "stopped" %}
+        {% if vms[vm]["state"] == "stopped" %}
         <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{vm}}">{{vm}}</button>
         {% endif %}
         {% endif %}
@@ -51,10 +51,10 @@
     <br>
     <p>Select node to start/stop:</p>
     <p>    {%for node in nodes %}
-        {% if nodes[node]["status"] == "started" %}
+        {% if nodes[node]["state"] == "started" %}
         <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{node}}">{{node}}</button>
         {% endif %}
-        {% if nodes[node]["status"] == "stopped" %}
+        {% if nodes[node]["state"] == "stopped" %}
         <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value="{{node}}">{{node}}</button>
         {% endif %}
         {% endfor %}</p>

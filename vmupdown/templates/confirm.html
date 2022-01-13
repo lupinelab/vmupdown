@@ -19,7 +19,7 @@
 </head>
 <body>
 <form action="/confirm" method="POST" id="form">
-    <p><b>{{runningvm}}</b> is currently using the GPU... shutdown <b>{{runningvm}}</b> and start <b>{{itemtoaction}}</b>?
+    <p><b>{{runningvm.name}}</b> is currently using the GPU... shutdown <b>{{runningvm.name}}</b> and start <b>{{itemtoaction.name}}</b>?
     <input type="submit" value="Ok">
 </p>
 </form>

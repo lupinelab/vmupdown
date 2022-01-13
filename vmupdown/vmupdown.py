@@ -96,7 +96,6 @@ def refreshvms():
             for match in matches:
                 vms[config.get("name")]["pcie"].append(config.get(match).split(",")[0])
             vms[config.get("name")]["state"] = checkvmstate(config.get("name"))
-    print(vms)
 
 
 def checknodestates():
@@ -113,17 +112,17 @@ def checkallvmstates():
 
 
 def vmdownup():
-    runningvm = session.get('runningvm', None)
-    itemtoaction = session.get('itemtoaction', None)
-    runningvm.shutdownvm
+    #runningvm = session.get('runningvm', None)
+    #itemtoaction = session.get('itemtoaction', None)
+    runningvm.shutdownvm()
     state = 1
     while state == 1:
-        if checkvmstate(runningvm) == "stopped":
+        if checkvmstate(runningvm.name) == "stopped":
             state = 0
         else:
             state = 1
     sleep(5)
-    itemtoaction.startvm
+    itemtoaction.startvm()
 
 
 refreshvms()
@@ -137,31 +136,31 @@ def refresh():
 @app.route('/', methods=["GET", "POST"])
 def vmupdown():
     if request.method == "POST":
+        global itemtoaction, runningvm
         itemtoaction = Itemtoaction(request.form["itemtoaction"])
-        session['itemtoaction'] = itemtoaction
+        # session['itemtoaction'] = itemtoaction
         state = 0
         if itemtoaction.name in nodes:
-            if checknodestate(itemtoaction) == "started":
+            if checknodestate(itemtoaction.name) == "started":
                 session['action'] = "shutdown"
                 return redirect(url_for("alreadystarted"))
             else:
                 session['action'] = "started"
                 return redirect(url_for("starting"))
-        if itemtoaction in vms:
-            if checkvmstate(itemtoaction) == "started":
+        if itemtoaction.name in vms:
+            if checkvmstate(itemtoaction.name) == "started":
                 return redirect(url_for("alreadystarted"))
-            if not vms[itemtoaction]["pcie"]:
+            if not itemtoaction.pcie:
                 session['action'] = "started"
                 return redirect(url_for("starting"))
             for vm in vms.keys():
-                if vms[vm]["vmid"] == vms[itemtoaction]["vmid"]:
+                if vms[vm]["vmid"] == itemtoaction.vmid:
                     continue
                 for pcie_device in vms[vm]["pcie"]:
-                    if pcie_device in vms[itemtoaction]["pcie"]:
+                    if pcie_device in itemtoaction.pcie:
                         if checkvmstate(vm) == "stopped":
                             continue
                         else:
-                            print(vms[vm]["vmid"])
                             state = 1
                             vm = Runningvm(vm)
                             session['runningvm'] = vm
@@ -176,7 +175,7 @@ def vmupdown():
 
 @app.route('/alreadystarted', methods=["GET", "POST"])
 def alreadystarted():
-    itemtoaction = session.get('itemtoaction', None)
+    #itemtoaction = session.get('itemtoaction', None)
     if request.method == 'GET':
         return render_template('alreadystarted.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
@@ -186,8 +185,8 @@ def alreadystarted():
 
 @app.route('/confirm', methods=["GET", "POST"])
 def confirm():
-    itemtoaction = session.get('itemtoaction', None)
-    runningvm = session.get('runningvm', None)
+    #itemtoaction = session.get('itemtoaction', None)
+    #runningvm = session.get('runningvm', None)
     if request.method == "POST":
         session['action'] = "started"
         return redirect(url_for("pleasewait"))
@@ -197,8 +196,8 @@ def confirm():
 
 @app.route('/pleasewait', methods=["GET", "POST"])
 def pleasewait():
-    itemtoaction = session.get('itemtoaction', None)
-    runningvm = session.get('runningvm', None)
+    #itemtoaction = session.get('itemtoaction', None)
+    #runningvm = session.get('runningvm', None)
     if request.method == 'GET':
         return render_template('pleasewait.html', runningvm=runningvm, itemtoaction=itemtoaction)
     if request.method == 'POST':
@@ -208,69 +207,69 @@ def pleasewait():
 
 @app.route('/starting', methods=["GET", "POST"])
 def starting():
-    itemtoaction = session.get('itemtoaction', None)
+    #itemtoaction = session.get('itemtoaction', None)
     if request.method == 'GET':
         return render_template('starting.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
-        if itemtoaction in nodes:
-            itemtoaction.startnode
+        if itemtoaction.name in nodes:
+            itemtoaction.startnode()
             return 'done'
-        if itemtoaction in vms:
-            itemtoaction.startvm
+        if itemtoaction.name in vms:
+            itemtoaction.startvm()
             return 'done'
 
 
 @app.route('/shuttingdown', methods=["GET", "POST"])
 def shuttingdown():
-    itemtoaction = session.get('itemtoaction', None)
+    #itemtoaction = session.get('itemtoaction', None)
     if request.method == 'GET':
         return render_template('shuttingdown.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
-        if itemtoaction in nodes:
-            itemtoaction.shutdownnode
+        if itemtoaction.name in nodes:
+            itemtoaction.shutdownnode()
             return 'done'
-        if itemtoaction in vms:
-            itemtoaction.shutdownvm
+        if itemtoaction.name in vms:
+            itemtoaction.shutdownvm()
             return 'done'
 
 
 @app.route('/done', methods=["GET", "POST"])
 def done():
-    itemtoaction = session.get('itemtoaction', None)
+    #itemtoaction = session.get('itemtoaction', None)
     action = session.get('action', None)
     state = 1
     if request.method == 'GET':
         if action == "started":
-            if itemtoaction in nodes:
+            if itemtoaction.name in nodes:
                 while state == 1:
-                    if checknodestate(itemtoaction) == "stopped":
+                    if checknodestate(itemtoaction.name) == "stopped":
                         state = 1
                         sleep(3)
                     else:
                         checknodestates()
                         refreshvms()
                         return render_template('done.html', itemtoaction=itemtoaction, action=action)
-            if itemtoaction in vms:
+            if itemtoaction.name in vms:
                 while state == 1:
-                    if checkvmstate(itemtoaction) == "stopped":
+                    if checkvmstate(itemtoaction.name) == "stopped":
                         state = 1
                         sleep(3)
                     else:
                         checkallvmstates()
                         return render_template('done.html', itemtoaction=itemtoaction, action=action)
         if action == "shutdown":
-            if itemtoaction in nodes:
+            if itemtoaction.name in nodes:
                 while state == 1:
-                    if checknodestate(itemtoaction) == "started":
+                    if checknodestate(itemtoaction.name) == "started":
                         state = 1
                         sleep(3)
                     else:
                         checknodestates()
                         refreshvms()
                         return render_template('done.html', itemtoaction=itemtoaction, action=action)
-            if itemtoaction in vms:
+            if itemtoaction.name in vms:
                 while state == 1:
-                    if checkvmstate(itemtoaction) == "started":
+                    if checkvmstate(itemtoaction.name) == "started":
                         state = 1
                         sleep(3)
                     else:
@@ -279,8 +278,8 @@ def done():
     if request.method == 'POST':
         sleep(3)
         session.pop('action', None)
-        session.pop('runningvm', None)
-        session.pop('itemtoaction', None)
+        # session.pop('runningvm', None)
+        # session.pop('itemtoaction', None)
         return 'done'
 
 
