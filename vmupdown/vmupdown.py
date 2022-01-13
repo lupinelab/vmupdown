@@ -9,8 +9,8 @@ app.config['SECRET_KEY'] = 'tidnsdhm'
 
 token = ""
 nodes = {
-        "proxmoxnode-01": {"ip": "192.168.20.2", "mac": "70:85:c2:c7:29:b3", "state": ""},
-        "qproxmoxnode-02": {"ip": "192.168.20.3", "mac": "e0:d5:5e:5f:60:c2", "state": ""}
+        "proxmoxnode-01": {"ip": "192.168.20.2", "mac": "70:85:c2:c7:29:b3", "status": ""},
+        "proxmoxnode-02": {"ip": "192.168.20.3", "mac": "e0:d5:5e:5f:60:c2", "status": ""}
         }
 sharedgpu = "0000:13:00"
 
