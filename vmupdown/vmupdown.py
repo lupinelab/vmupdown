@@ -6,10 +6,10 @@ from proxmoxer import ProxmoxAPI
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tidnsdhm'
 
-token = ""
+token = "31dc4f09-871e-44eb-9392-4e38b63aab2b"
 nodes = {
-        "proxmoxnode-01": {"ip": "192.168.20.2", "mac": "d6:09:6b:f3:72:ec", "status": ""},
-        "proxmoxnode-02": {"ip": "192.168.20.3", "mac": "e0:d5:5e:5f:60:c2", "status": ""}
+        "qproxmox-01": {"ip": "192.168.20.2", "mac": "d6:09:6b:f3:72:ec", "status": ""},
+        "qproxmox-02": {"ip": "192.168.20.3", "mac": "e0:d5:5e:5f:60:c2", "status": ""}
         }
 sharedgpu = "0000:0f:00"
 
@@ -98,6 +98,7 @@ def refreshvms():
                 vms[vmid]["name"] = config.get("name")
                 vms[vmid]["host"] = vmidpernodedict[vmid]["node"]
                 vms[vmid]["type"] = vmidpernodedict[vmid]["type"]
+                vms[vmid]["mac"] = config.get("net0").split(",")[0].split("=")[-1]
                 vms[vmid]["pcie"] = []
                 for line in config.keys():
                     if line.startswith("hostpci"):
