@@ -1,4 +1,7 @@
+from logging.config import listen
 import os
+import socket
+import threading
 from time import sleep
 from flask import Flask, request, render_template, redirect, url_for, session
 from proxmoxer import ProxmoxAPI
@@ -141,6 +144,26 @@ def vmdownup():
 refreshvms()
 
 
+def wol_listener():
+    HOST = ""
+    WAL_PORT = 9
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((HOST, WAL_PORT))
+    while True:
+        magic_packet = s.recv(128).hex()
+        raw_mac = magic_packet.strip("f")[0:12].upper()
+        mac = ':'.join(raw_mac[i:i+2] for i in range(0, len(raw_mac), 2))
+        for vm in vms:
+            if vms[vm]["type"] == "qemu":
+                if vms[vm]["mac"] == mac:
+                        proxmoxer_connection(vms[vm]["host"]).nodes(vms[vm]["host"]).qemu(vm).status.start.post()
+
+
+listener = threading.Thread(target=wol_listener, daemon=True)
+listener.start()
+
+
 @app.route('/refresh')
 def refresh():
     refreshvms()
@@ -279,3 +302,8 @@ def done():
         sleep(3)
         session.pop('action', None)
         return 'done'
+
+
+# Remove this before running from apache
+if __name__ == "__main__":
+    app.run(host="192.168.10.6", port=8080, debug=True)
