@@ -321,4 +321,4 @@ def done():
 
 # Remove this before running from apache
 if __name__ == "__main__":
-    app.run(host="192.168.10.6", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
