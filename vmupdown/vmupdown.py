@@ -157,7 +157,22 @@ def wol_listener():
         for vm in vms:
             if vms[vm]["type"] == "qemu":
                 if vms[vm]["mac"] == mac:
-                        proxmoxer_connection(vms[vm]["host"]).nodes(vms[vm]["host"]).qemu(vm).status.start.post()
+                    itemtoaction = Itemtoaction(vm)
+        for vm in vms.keys():
+            if vms[vm]["type"] == "qemu":
+                if vm == itemtoaction.vmid:
+                    continue
+                for pcie_device in vms[vm]["pcie"]:
+                    if pcie_device in itemtoaction.pcie:
+                        print(vms[vm]["pcie"])
+                        if checkvmstate(vm) == "started":
+                            print(vm)
+                            runningvm = Runningvm(vm)
+                            vmdownup()
+                        else:
+                            print(itemtoaction)
+                            proxmoxer_connection(itemtoaction.host).nodes(itemtoaction.host).qemu(itemtoaction.vmid).status.start.post()
+                            
 
 
 listener = threading.Thread(target=wol_listener, daemon=True)
