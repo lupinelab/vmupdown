@@ -1,3 +1,4 @@
+from base64 import decode
 import os
 import socket
 import threading
@@ -184,53 +185,56 @@ refreshvms()
 # listener.start()
 
 
-class Wol_Listener(object):
-    def __init__(self):
-        thread = threading.Thread(target=self.run, args=())
-        thread.daemon = True
-        thread.start()
-    
-    def run(self):
-        HOST = ""
-        WAL_PORT = 9
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+def wol_listener():
+    HOST = ""
+    WAL_PORT = 9
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind((HOST, WAL_PORT))
+        global wol_target
+        
+
         while True:
-            magic_packet = s.recv(128).hex()
+            magic_packet = s.recv(1024).hex()
+            print(magic_packet)
             raw_mac = magic_packet.strip("f")[0:12].upper()
             mac = ':'.join(raw_mac[i:i+2] for i in range(0, len(raw_mac), 2))
-            print(magic_packet)
             for vm in vms:
                 if vms[vm]["type"] == "qemu":
                     if vms[vm]["mac"] == mac:
                         wol_target = vm
-            if checkvmstate(wol_target) == "started":
-                pass
-            elif vms[wol_target]["pcie"] == []:
-                proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
-            else:
-                state = 0
-                for vm in vms.keys():
-                    if vms[vm]["type"] == "qemu":
-                        if vm == wol_target:
-                            continue
-                        for pcie_device in vms[vm]["pcie"]:
-                            if pcie_device in vms[wol_target]["pcie"]:
-                                if checkvmstate(vm) == "stopped":
-                                    continue
-                                else:
-                                    state = 1
-                                    runningvm = Runningvm(vm)
-                if state != 0:
-                    print("vmdownup")
-                    #vmdownup()
-                if state == 0:
-                    print("starting pcie vm")
-                    proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
+            if wol_target:
+            #for wol_target in wol_targets:
+                print(wol_target)
+                if checkvmstate(wol_target) == "started":
+                    continue
+                elif vms[wol_target]["pcie"] == []:
+                    print("starting")
+                    #proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
+                else:
+                    state = 0
+                    for vm in vms.keys():
+                        if vms[vm]["type"] == "qemu":
+                            if vm == wol_target:
+                                continue
+                            for pcie_device in vms[vm]["pcie"]:
+                                if pcie_device in vms[wol_target]["pcie"]:
+                                    if checkvmstate(vm) == "stopped":
+                                        continue
+                                    else:
+                                        state = 1
+                                        runningvm = Runningvm(vm)
+                    if state != 0:
+                        print("vmdownup")
+                        #vmdownup()
+                    if state == 0:
+                        print("starting pcie vm")
+                        proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
 
 
-listener = Wol_Listener()
+thread = threading.Thread(target=wol_listener, args=())
+thread.daemon = True
+thread.start()
+
 
 @app.route('/refresh')
 def refresh():
