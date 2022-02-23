@@ -144,55 +144,12 @@ def vmdownup():
 refreshvms()
 
 
-# def wol_listener():
-#     global itemtoaction, runningvm
-#     HOST = ""
-#     WAL_PORT = 9
-#     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#     s.bind((HOST, WAL_PORT))
-#     while True:
-#         magic_packet = s.recv(128).hex()
-#         raw_mac = magic_packet.strip("f")[0:12].upper()
-#         mac = ':'.join(raw_mac[i:i+2] for i in range(0, len(raw_mac), 2))
-#         print(magic_packet)
-#         for vm in vms:
-#             if vms[vm]["type"] == "qemu":
-#                 if vms[vm]["mac"] == mac:
-#                     itemtoaction = Itemtoaction(vm)
-#         if itemtoaction.pcie == []:
-#             proxmoxer_connection(itemtoaction.host).nodes(itemtoaction.host).qemu(itemtoaction.vmid).status.start.post()
-#         else:
-#             for vm in vms.keys():
-#                 if vms[vm]["type"] == "qemu":
-#                     if vm == itemtoaction.vmid:
-#                         continue
-#                     for pcie_device in itemtoaction.pcie:    
-#                         if pcie_device in vms[vm]["pcie"]:
-#                             if checkvmstate(vm) == "started":
-#                                 runningvm = Runningvm(vm)
-#                                 print("downup")
-#                                 #vmdownup()
-#                                 break
-#                             else:
-#                                 continue
-#         #else:
-#             #print("all good")
-#             #proxmoxer_connection(itemtoaction.host).nodes(itemtoaction.host).qemu(itemtoaction.vmid).status.start.post()
-
-
-# listener = threading.Thread(target=wol_listener, daemon=True)
-# listener.start()
-
-
 def wol_listener():
     HOST = ""
     WAL_PORT = 9
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind((HOST, WAL_PORT))
         global wol_target
-        
-
         while True:
             magic_packet = s.recv(1024).hex()
             print(magic_packet)
@@ -209,7 +166,7 @@ def wol_listener():
                     continue
                 elif vms[wol_target]["pcie"] == []:
                     print("starting")
-                    #proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
+                    proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
                 else:
                     state = 0
                     for vm in vms.keys():
@@ -222,10 +179,13 @@ def wol_listener():
                                         continue
                                     else:
                                         state = 1
+                                        global itemtoaction
+                                        global runningvm
+                                        itemtoaction = Itemtoaction(wol_target)
                                         runningvm = Runningvm(vm)
                     if state != 0:
                         print("vmdownup")
-                        #vmdownup()
+                        vmdownup()
                     if state == 0:
                         print("starting pcie vm")
                         proxmoxer_connection(vms[wol_target]["host"]).nodes(vms[wol_target]["host"]).qemu(wol_target).status.start.post()
