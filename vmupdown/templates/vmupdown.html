@@ -17,6 +17,13 @@
       </style
 <head>
 <title>Lupinelab VM Control</title>
+<script>
+function timedRefresh(timeoutPeriod) {
+	setTimeout("location.reload(true);",timeoutPeriod);
+}
+
+window.onload = timedRefresh(5000);
+</script>
 </head>
 <body>
 <form action="/refresh">
@@ -27,24 +34,24 @@
 <form action="/" method="POST" id="form">
     <p>Select GPU enabled VM to start/stop:</p>
     <p>    {%for vm in vms %}
-        {% if sharedgpu in vms[vm]["pcie"] %}
-        {% if vms[vm]["state"] == "started" %}
-        <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm}}>{{vms[vm]["name"]}}</button>
+        {% if sharedgpu in vm.pcie %}
+        {% if vm.state == "started" %}
+        <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm.vmid}}>{{vm.name}}</button>
         {% endif %}
-        {% if vms[vm]["state"] == "stopped" %}
-        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm}}>{{vms[vm]["name"]}}</button>
+        {% if vm.state == "stopped" %}
+        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm.vmid}}>{{vm.name}}</button>
         {% endif %}
         {% endif %}
         {% endfor %}</p>
 <br>
     <p>Select service VM to start/stop:</p>
     <p>    {%for vm in vms %}
-        {% if not sharedgpu in vms[vm]["pcie"] %}
-        {% if vms[vm]["state"] == "started" %}
-        <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm}}>{{vms[vm]["name"]}}</button>
+        {% if not sharedgpu in vm.pcie %}
+        {% if vm.state == "started" %}
+        <button style="background-color:#d9ffd2; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm.vmid}}>{{vm.name}}</button>
         {% endif %}
-        {% if vms[vm]["state"] == "stopped" %}
-        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm}}>{{vms[vm]["name"]}}</button>
+        {% if vm.state == "stopped" %}
+        <button style="background-color:#ffb3b3; border:none; cursor:pointer; padding:16px 32px; margin:8px; border-radius: 4px; text-align:center; text-decoration:none; display:inline-block" name="itemtoaction" type="submit" value={{vm.vmid}}>{{vm.name}}</button>
         {% endif %}
         {% endif %}
         {% endfor %}</p>
