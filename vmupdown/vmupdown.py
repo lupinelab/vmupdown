@@ -100,7 +100,7 @@ def checknodestate(node):
 def refreshvms():
     global vms
     vmsdict = {}
-    vms = []
+    loadvms = []
     vmidpernodedict = {}
     hosts = []
     checknodestates()
@@ -122,20 +122,21 @@ def refreshvms():
                 for line in config.keys():
                     if line.startswith("hostpci"):
                             vmsdict[vmid]["pcie"].append(config.get(line).split(",")[0])
-                vms.append(VM(vmid, config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
+                loadvms.append(VM(vmid, config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
             if vmidpernodedict[vmid]["type"] == "lxc":
                 config = proxmoxer_connection(vmidpernodedict[vmid]["node"]).nodes(vmidpernodedict[vmid]["node"]).lxc(vmid).config.get()
-                vms.append(VM(vmid, config.get("hostname"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
-    for vm in vms:
+                loadvms.append(VM(vmid, config.get("hostname"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
+    for vm in loadvms:
         if vm.type == "qemu":
             vm.pcie = vmsdict[vm.vmid]["pcie"]
         vm.state = checkvmstate(vm)
+    vms = loadvms
 
 
 def autorefreshvms():
     while True:
         sleep(60)
-        checkvmstates()
+        refreshvms()
 
 
 def checknodestates():
