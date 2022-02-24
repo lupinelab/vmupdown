@@ -200,11 +200,11 @@ def vmupdown():
             if itemtoaction.pcie == []:
                 session['action'] = "started"
                 return redirect(url_for("starting"))
-            for vm in vms.keys():
-                if vms[vm]["type"] == "qemu":
+            for vm in vms:
+                if vm.type == "qemu":
                     if vm == itemtoaction.vmid:
                         continue
-                    for pcie_device in vms[vm]["pcie"]:
+                    for pcie_device in vm.pcie:
                         if pcie_device in itemtoaction.pcie:
                             if checkvmstate(vm) == "stopped":
                                 continue
