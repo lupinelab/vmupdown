@@ -38,7 +38,7 @@ class Itemtoaction:
             self.state = nodes[item]["state"]
         else:
             for vm in vms:
-                if item == str(vm.vmid):
+                if item == vm.vmid:
                     item = vm
                     self.vmid = vm.vmid
                     self.name = vm.name
@@ -122,13 +122,13 @@ def refreshvms():
                 for line in config.keys():
                     if line.startswith("hostpci"):
                             vmsdict[vmid]["pcie"].append(config.get(line).split(",")[0])
-                loadvms.append(VM(vmid, config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
+                loadvms.append(VM(str(vmid), config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
             if vmidpernodedict[vmid]["type"] == "lxc":
                 config = proxmoxer_connection(vmidpernodedict[vmid]["node"]).nodes(vmidpernodedict[vmid]["node"]).lxc(vmid).config.get()
-                loadvms.append(VM(vmid, config.get("hostname"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
+                loadvms.append(VM(str(vmid), config.get("hostname"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
     for vm in loadvms:
         if vm.type == "qemu":
-            vm.pcie = vmsdict[vm.vmid]["pcie"]
+            vm.pcie = vmsdict[int(vm.vmid)]["pcie"]
         vm.state = checkvmstate(vm)
     vms = loadvms
 
@@ -156,7 +156,7 @@ def vmdownup():
     runningvm.shutdown()
     state = 1
     while state == 1:
-        if checkvmstate(runningvm.vmid) == "stopped":
+        if checkvmstate(runningvm) == "stopped":
             state = 0
         else:
             state = 1
@@ -210,7 +210,7 @@ def vmupdown():
                                 continue
                             else:
                                 state = 1
-                                runningvm = Runningvm(vm)
+                                runningvm = Runningvm(vm.vmid)
             if state != 0:
                 return redirect(url_for("confirm"))
             if state == 0:
