@@ -1,4 +1,4 @@
 .gitignore
 Pipfile.lock
-__pycache__/
+vmupdown/__pycache__/
 Pipfile
