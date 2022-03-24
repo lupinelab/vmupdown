@@ -1,17 +1,13 @@
+from distutils.command.config import config
 import os
 import threading
 from time import sleep
 from flask import Flask, request, render_template, redirect, url_for, session
 from proxmoxer import ProxmoxAPI
+from config import token, nodes, sharedgpu 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tidnsdhm'
-
-token = "31dc4f09-871e-44eb-9392-4e38b63aab2b"
-nodes = {
-        "qproxmox-01": {"ip": "192.168.20.2", "mac": "d6:09:6b:f3:72:ec", "status": ""}
-        }
-sharedgpu = "0000:0f:00"
 
 
 def proxmoxer_connection(node):
@@ -310,3 +306,7 @@ def done():
         sleep(3)
         session.pop('action', None)
         return 'done'
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)
