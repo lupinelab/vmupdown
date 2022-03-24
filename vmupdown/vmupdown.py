@@ -9,8 +9,7 @@ app.config['SECRET_KEY'] = 'tidnsdhm'
 
 token = "31dc4f09-871e-44eb-9392-4e38b63aab2b"
 nodes = {
-        "qproxmox-01": {"ip": "192.168.20.2", "mac": "d6:09:6b:f3:72:ec", "status": ""},
-        "qproxmox-02": {"ip": "192.168.20.3", "mac": "e0:d5:5e:5f:60:c2", "status": ""}
+        "qproxmox-01": {"ip": "192.168.20.2", "mac": "d6:09:6b:f3:72:ec", "status": ""}
         }
 sharedgpu = "0000:0f:00"
 
@@ -74,8 +73,7 @@ class Itemtoaction:
 
 
 class Runningvm(Itemtoaction):
-    def __init__(self, runningvm):
-        super().__init__(runningvm)
+    pass
 
 
 def checkvmstate(vm):
@@ -183,6 +181,7 @@ def vmupdown():
     if request.method == "POST":
         global itemtoaction, runningvm
         itemtoaction = Itemtoaction(request.form["itemtoaction"])
+        print(itemtoaction.name)
         state = 0
         if itemtoaction.name in nodes:
             if checknodestate(itemtoaction.name) == "started":
@@ -205,12 +204,13 @@ def vmupdown():
                     if vm == itemtoaction.vmid:
                         continue
                     for pcie_device in vm.pcie:
-                        if pcie_device in itemtoaction.pcie:
+                        if pcie_device == sharedgpu:
                             if checkvmstate(vm) == "stopped":
                                 continue
                             else:
                                 state = 1
                                 runningvm = Runningvm(vm.vmid)
+                                print(runningvm)
             if state != 0:
                 return redirect(url_for("confirm"))
             if state == 0:
@@ -310,8 +310,3 @@ def done():
         sleep(3)
         session.pop('action', None)
         return 'done'
-
-
-# Remove this before running from apache
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
