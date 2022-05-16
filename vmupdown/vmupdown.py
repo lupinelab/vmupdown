@@ -107,13 +107,13 @@ def refreshvms():
         vmidpernodedict[vm["vmid"]] = {}
         vmidpernodedict[vm["vmid"]]["node"] = vm["node"]
         vmidpernodedict[vm["vmid"]]["type"] = vm["type"]
-    for vmid in vmidpernodedict.keys():
+    for vmid in vmidpernodedict:
         if vmidpernodedict[vmid]["node"] in hosts:
             if vmidpernodedict[vmid]["type"] == "qemu":
                 config = proxmoxer_connection(vmidpernodedict[vmid]["node"]).nodes(vmidpernodedict[vmid]["node"]).qemu(vmid).config.get()
                 vmsdict[vmid] = {}
                 vmsdict[vmid]["pcie"] = []
-                for line in config.keys():
+                for line in config:
                     if line.startswith("hostpci"):
                             vmsdict[vmid]["pcie"].append(config.get(line).split(",")[0])
                 loadvms.append(VM(str(vmid), config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
