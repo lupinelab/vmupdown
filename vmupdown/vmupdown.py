@@ -178,6 +178,7 @@ thread.start()
 
 @app.route('/refresh')
 def refresh():
+    checkhoststates()
     refreshvms()
     return redirect(url_for("vmupdown"))
 
