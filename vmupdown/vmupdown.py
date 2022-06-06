@@ -9,27 +9,30 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tidnsdhm'
 
 
-def proxmoxer_connection(node):
-    connection = ProxmoxAPI(nodes[node]["ip"], user="vmupdown@pam", token_name="vmupdown", token_value=token, verify_ssl=False)
-    return connection
+class Host:
+    def __init__(self, name, ip, mac, status = ""):
+        self.name = name
+        self.ip = ip
+        self.mac = mac
+        self.status = status
 
 
 class VM:
-    def __init__(self, vm, name, host, type, pcie = [], state = ""):
+    def __init__(self, vm, name, host, type, pcie = [], status = ""):
         self.vmid = vm
         self.name = name
         self.host = host
         self.type = type
         self.pcie = pcie
-        self.state = state
+        self.status = status
 
 
 class Itemtoaction:
     def __init__(self, item):
-        if item in nodes:
+        if item in hosts.keys():
             self.name = item
-            self.mac = nodes[item]["mac"]
-            self.state = nodes[item]["state"]
+            self.mac = hosts[item].mac
+            self.status = hosts[item].status
         else:
             for vm in vms:
                 if item == vm.vmid:
@@ -44,51 +47,63 @@ class Itemtoaction:
             
                 
     def start(self):
-        if self.name in nodes:
+        if self.name in hosts.keys():
             command = "wakeonlan " + self.mac + " >/dev/null"
             os.system(command)
         else:
             if self.type == "qemu":
-                proxmoxer_connection(self.host).nodes(self.host).qemu(self.vmid).status.start.post()
+                proxmoxer_connection(hosts[self.host]).nodes(self.host).qemu(self.vmid).status.start.post()
             if self.type == "lxc":
-                proxmoxer_connection(self.host).nodes(self.host).lxc(self.vmid).status.start.post()
+                proxmoxer_connection(hosts[self.host]).nodes(self.host).lxc(self.vmid).status.start.post()
 
 
     def shutdown(self):
-        if self.name in nodes:
-            proxmoxer_connection(self.name).nodes(self.name).status.post(command="shutdown")
+        if self.name in hosts.keys():
+            proxmoxer_connection(hosts[self.name]).nodes(self.name).status.post(command="shutdown")
         else:
             if self.type == "qemu":
                 try:
-                    proxmoxer_connection(self.host).nodes(self.host).qemu(self.vmid).agent.shutdown.post()
+                    proxmoxer_connection(hosts[self.host]).nodes(self.host).qemu(self.vmid).agent.shutdown.post()
                 except:
                     pass
-                proxmoxer_connection(self.host).nodes(self.host).qemu(self.vmid).status.shutdown.post()
+                proxmoxer_connection(hosts[self.host]).nodes(self.host).qemu(self.vmid).status.shutdown.post()
             if self.type == "lxc":
-                proxmoxer_connection(self.host).nodes(self.host).lxc(self.vmid).status.shutdown.post()
+                proxmoxer_connection(hosts[self.host]).nodes(self.host).lxc(self.vmid).status.shutdown.post()
 
 
 class Runningvm(Itemtoaction):
     pass
 
 
-def checkvmstate(vm):
+def proxmoxer_connection(node):
+    connection = ProxmoxAPI(node.ip, user="vmupdown@pam", token_name="vmupdown", token_value=token, verify_ssl=False)
+    return connection
+
+
+def checkvmstatus(vm):
     if vm.type == "qemu":
-        state = proxmoxer_connection(vm.host).nodes(vm.host).qemu(vm.vmid).status.current.get()
+        status = proxmoxer_connection(hosts[vm.host]).nodes(vm.host).qemu(vm.vmid).status.current.get()
     if vm.type == "lxc":
-        state = proxmoxer_connection(vm.host).nodes(vm.host).lxc(vm.vmid).status.current.get()
-    if state["status"] == "stopped":
+        status = proxmoxer_connection(hosts[vm.host]).nodes(vm.host).lxc(vm.vmid).status.current.get()
+    if status["status"] == "stopped":
         return "stopped"
-    elif state["status"] == "running":
+    elif status["status"] == "running":
         return "started"
 
 
-def checknodestate(node):
-    ping = "ping " + nodes[node]["ip"] + " -c 1 -W 3 >/dev/null"
+def checkhoststatus(ip):
+    ping = "ping " + ip + " -c 1 -W 3 >/dev/null"
     if os.system(ping) == 0:
         return "started"
     else:
         return "stopped"
+
+
+def get_hosts():
+    global hosts
+    hosts = {}
+    for node in nodes:
+        hosts[node]=Host(node, nodes[node]["ip"], nodes[node]["mac"], checkhoststatus(nodes[node]["ip"]))
 
 
 def refreshvms():
@@ -96,21 +111,16 @@ def refreshvms():
     vmsdict = {}
     loadvms = []
     vmidpernodedict = {}
-    hosts = []
-    checknodestates()
-    for node in nodes:
-        if nodes[node]["state"] == "started":
-            hosts.append(node)
     if hosts == []:
         return
-    for vm in proxmoxer_connection(hosts[0]).cluster.resources.get(type="vm"):
+    for vm in proxmoxer_connection(hosts[list(hosts.keys())[0]]).cluster.resources.get(type="vm"):
         vmidpernodedict[vm["vmid"]] = {}
         vmidpernodedict[vm["vmid"]]["node"] = vm["node"]
         vmidpernodedict[vm["vmid"]]["type"] = vm["type"]
     for vmid in vmidpernodedict:
         if vmidpernodedict[vmid]["node"] in hosts:
             if vmidpernodedict[vmid]["type"] == "qemu":
-                config = proxmoxer_connection(vmidpernodedict[vmid]["node"]).nodes(vmidpernodedict[vmid]["node"]).qemu(vmid).config.get()
+                config = proxmoxer_connection(hosts[vmidpernodedict[vmid]["node"]]).nodes(vmidpernodedict[vmid]["node"]).qemu(vmid).config.get()
                 vmsdict[vmid] = {}
                 vmsdict[vmid]["pcie"] = []
                 for line in config:
@@ -118,48 +128,48 @@ def refreshvms():
                             vmsdict[vmid]["pcie"].append(config.get(line).split(",")[0])
                 loadvms.append(VM(str(vmid), config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
             if vmidpernodedict[vmid]["type"] == "lxc":
-                config = proxmoxer_connection(vmidpernodedict[vmid]["node"]).nodes(vmidpernodedict[vmid]["node"]).lxc(vmid).config.get()
+                config = proxmoxer_connection(hosts[vmidpernodedict[vmid]["node"]]).nodes(vmidpernodedict[vmid]["node"]).lxc(vmid).config.get()
                 loadvms.append(VM(str(vmid), config.get("hostname"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
     for vm in loadvms:
         if vm.type == "qemu":
             vm.pcie = vmsdict[int(vm.vmid)]["pcie"]
-        vm.state = checkvmstate(vm)
+        vm.status = checkvmstatus(vm)
     vms = loadvms
 
 
 def autorefreshvms():
     while True:
         sleep(60)
+        checkhoststates()
         refreshvms()
 
 
-def checknodestates():
-    for node in nodes:
-        if checknodestate(node) == "started":
-            nodes[node]["state"] = "started"
+def checkhoststates():
+    for host in hosts:
+        if checkhoststatus(hosts[host].ip) == "started":
+            hosts[host].status = "started"
         else:
-            nodes[node]["state"] = "stopped"
+            hosts[host].status = "started"
 
 
 def checkvmstates():
     for vm in vms:
-        vm.state = checkvmstate(vm)
+        vm.status = checkvmstatus(vm)
 
 
 def vmdownup():
     runningvm.shutdown()
     state = 1
     while state == 1:
-        if checkvmstate(runningvm) == "stopped":
+        if checkvmstatus(runningvm) == "stopped":
             state = 0
         else:
             state = 1
     sleep(5)
     itemtoaction.start()
 
-
+get_hosts()
 refreshvms()
-
 
 thread = threading.Thread(target=autorefreshvms, args=())
 thread.daemon = True
@@ -179,15 +189,15 @@ def vmupdown():
         itemtoaction = Itemtoaction(request.form["itemtoaction"])
         print(itemtoaction.name)
         state = 0
-        if itemtoaction.name in nodes:
-            if checknodestate(itemtoaction.name) == "started":
+        if itemtoaction.name in hosts.keys():
+            if checkhoststatus(hosts[itemtoaction.name].ip) == "started":
                 session['action'] = "shutdown"
                 return redirect(url_for("alreadystarted"))
             else:
                 session['action'] = "started"
                 return redirect(url_for("starting"))
         else:
-            if checkvmstate(itemtoaction) == "started":
+            if checkvmstatus(itemtoaction) == "started":
                 return redirect(url_for("alreadystarted"))
             if itemtoaction.type == "lxc":
                 session['action'] = "started"
@@ -201,7 +211,7 @@ def vmupdown():
                         continue
                     for pcie_device in vm.pcie:
                         if pcie_device == sharedgpu:
-                            if checkvmstate(vm) == "stopped":
+                            if checkvmstatus(vm) == "stopped":
                                 continue
                             else:
                                 state = 1
@@ -213,7 +223,7 @@ def vmupdown():
                 session['action'] = "started"
                 return redirect(url_for("starting"))
     else:
-        return render_template("vmupdown.html", vms=vms, nodes=nodes, sharedgpu=sharedgpu)
+        return render_template("vmupdown.html", vms=vms, hosts=hosts, sharedgpu=sharedgpu)
 
 
 @app.route('/alreadystarted', methods=["GET", "POST"])
@@ -267,36 +277,36 @@ def done():
     state = 1
     if request.method == 'GET':
         if action == "started":
-            if itemtoaction.name in nodes:
+            if itemtoaction.name in hosts.keys():
                 while state == 1:
-                    if checknodestate(itemtoaction.name) == "stopped":
+                    if checkhoststatus(hosts[itemtoaction.name].ip) == "stopped":
                         state = 1
                         sleep(3)
                     else:
-                        checknodestates()
+                        checkhoststates()
                         refreshvms()
                         return render_template('done.html', itemtoaction=itemtoaction, action=action)
             else:
                 while state == 1:
-                    if checkvmstate(itemtoaction) == "stopped":
+                    if checkvmstatus(itemtoaction) == "stopped":
                         state = 1
                         sleep(3)
                     else:
                         checkvmstates()
                         return render_template('done.html', itemtoaction=itemtoaction, action=action)
         if action == "shutdown":
-            if itemtoaction.name in nodes:
+            if itemtoaction.name in hosts.keys():
                 while state == 1:
-                    if checknodestate(itemtoaction.name) == "started":
+                    if checkhoststatus(hosts[itemtoaction.name].ip) == "started":
                         state = 1
                         sleep(3)
                     else:
-                        checknodestates()
+                        checkhoststates()
                         refreshvms()
                         return render_template('done.html', itemtoaction=itemtoaction, action=action)
             else:
                 while state == 1:
-                    if checkvmstate(itemtoaction) == "started":
+                    if checkvmstatus(itemtoaction) == "started":
                         state = 1
                         sleep(3)
                     else:
