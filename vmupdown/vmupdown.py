@@ -1,5 +1,5 @@
-import os
-import threading
+from os import system
+from threading import Thread
 from time import sleep
 from flask import Flask, request, render_template, redirect, url_for, session
 from proxmoxer import ProxmoxAPI
@@ -10,8 +10,7 @@ app.config['SECRET_KEY'] = 'tidnsdhm'
 
 
 class Host:
-    def __init__(self, name, ip, mac, status = ""):
-        self.name = name
+    def __init__(self, ip, mac, status = ""):
         self.ip = ip
         self.mac = mac
         self.status = status
@@ -49,7 +48,7 @@ class Itemtoaction:
     def start(self):
         if self.name in hosts.keys():
             command = "wakeonlan " + self.mac + " >/dev/null"
-            os.system(command)
+            system(command)
         else:
             if self.type == "qemu":
                 proxmoxer_connection(hosts[self.host]).nodes(self.host).qemu(self.vmid).status.start.post()
@@ -92,8 +91,8 @@ def checkvmstatus(vm):
 
 
 def checkhoststatus(ip):
-    ping = "ping " + ip + " -c 1 -W 3 >/dev/null"
-    if os.system(ping) == 0:
+    ping = "ping " + ip + " -c 1 -W 2 >/dev/null"
+    if system(ping) == 0:
         return "started"
     else:
         return "stopped"
@@ -103,7 +102,7 @@ def get_hosts():
     global hosts
     hosts = {}
     for node in nodes:
-        hosts[node]=Host(node, nodes[node]["ip"], nodes[node]["mac"], checkhoststatus(nodes[node]["ip"]))
+        hosts[node]=Host(nodes[node]["ip"], nodes[node]["mac"], checkhoststatus(nodes[node]["ip"]))
 
 
 def refreshvms():
@@ -149,7 +148,7 @@ def checkhoststates():
         if checkhoststatus(hosts[host].ip) == "started":
             hosts[host].status = "started"
         else:
-            hosts[host].status = "started"
+            hosts[host].status = "stopped"
 
 
 def checkvmstates():
@@ -171,7 +170,8 @@ def vmdownup():
 get_hosts()
 refreshvms()
 
-thread = threading.Thread(target=autorefreshvms, args=())
+
+thread = Thread(target=autorefreshvms, args=())
 thread.daemon = True
 thread.start()
 
@@ -188,7 +188,6 @@ def vmupdown():
     if request.method == "POST":
         global itemtoaction, runningvm
         itemtoaction = Itemtoaction(request.form["itemtoaction"])
-        print(itemtoaction.name)
         state = 0
         if itemtoaction.name in hosts.keys():
             if checkhoststatus(hosts[itemtoaction.name].ip) == "started":
