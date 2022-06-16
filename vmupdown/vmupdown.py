@@ -3,7 +3,7 @@ from threading import Thread
 from time import sleep
 from flask import Flask, request, render_template, redirect, url_for, session
 from proxmoxer import ProxmoxAPI
-from config import token, nodes, sharedgpu 
+from config.config import token, nodes, sharedgpu 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tidnsdhm'
