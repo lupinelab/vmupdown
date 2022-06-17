@@ -124,7 +124,7 @@ def refreshvms():
                 vmsdict[vmid]["pcie"] = []
                 for line in config:
                     if line.startswith("hostpci"):
-                            vmsdict[vmid]["pcie"].append(config.get(line).split(",")[0])
+                        vmsdict[vmid]["pcie"].append(config.get(line).split(",")[0])
                 loadvms.append(VM(str(vmid), config.get("name"), vmidpernodedict[vmid]["node"], vmidpernodedict[vmid]["type"]))
             if vmidpernodedict[vmid]["type"] == "lxc":
                 config = proxmoxer_connection(hosts[vmidpernodedict[vmid]["node"]]).nodes(vmidpernodedict[vmid]["node"]).lxc(vmid).config.get()
@@ -207,16 +207,16 @@ def vmupdown():
                 return redirect(url_for("starting"))
             for vm in vms:
                 if vm.type == "qemu":
-                    if vm == itemtoaction.vmid:
-                        continue
-                    for pcie_device in vm.pcie:
-                        if pcie_device == sharedgpu:
-                            if checkvmstatus(vm) == "stopped":
-                                continue
-                            else:
-                                state = 1
-                                runningvm = Runningvm(vm.vmid)
-                                print(runningvm)
+                    if sharedgpu in itemtoaction.pcie:
+                        if vm == itemtoaction.vmid:
+                            continue
+                        for pcie_device in vm.pcie:
+                            if pcie_device == sharedgpu:
+                                if checkvmstatus(vm) == "stopped":
+                                    continue
+                                else:
+                                    state = 1
+                                    runningvm = Runningvm(vm.vmid)
             if state != 0:
                 return redirect(url_for("confirm"))
             if state == 0:
