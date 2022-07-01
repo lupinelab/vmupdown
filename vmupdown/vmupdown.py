@@ -8,7 +8,6 @@ from config.config import token, nodes, sharedgpu
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tidnsdhm'
 
-
 class Host:
     def __init__(self, ip, mac, status = ""):
         self.ip = ip
