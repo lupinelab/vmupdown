@@ -32,7 +32,7 @@ chmod +x /var/www/html/vmupdown/vmupdown.*
 - Create a 'Role' in proxmox called 'vmupdown' and give it the following privileges:
 <br />Sys.PowerMgmt, VM.Audit, VM.PowerMgmt
 - Create 'Permissions' for both /nodes and /vms for the user and role above.
-- Create an API Token for the vmupdown user. Note it down.
+- Create an API Token for the vmupdown user. Disable 'Privilege Separation'. Note it down.
 - Fill out the variables in config.py with values appropriate to your setup:
   
   token = "proxmox-api-token-goes-here"
