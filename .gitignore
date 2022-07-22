@@ -1,5 +1,4 @@
 .gitignore
 Pipfile.lock
 vmupdown/__pycache__/
-Pipfile
 vmupdown/config/__pycache__/

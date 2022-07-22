@@ -16,11 +16,11 @@ class Host:
 
 
 class VM:
-    def __init__(self, vm, name, host, type, pcie = [], status = ""):
+    def __init__(self, vm, name, host, vmtype, pcie = [], status = ""):
         self.vmid = vm
         self.name = name
         self.host = host
-        self.type = type
+        self.type = vmtype
         self.pcie = pcie
         self.status = status
 
