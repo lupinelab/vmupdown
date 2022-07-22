@@ -210,7 +210,7 @@ def vmupdown():
                         if vm == itemtoaction.vmid:
                             continue
                         for pcie_device in vm.pcie:
-                            if pcie_device == sharedgpu:
+                            if pcie_device.startswith(sharedgpu):
                                 if checkvmstatus(vm) == "stopped":
                                     continue
                                 else:
