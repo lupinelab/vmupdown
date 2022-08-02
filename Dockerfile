@@ -6,7 +6,7 @@ RUN pip3 install flask proxmoxer requests
 
 RUN rm /var/www/html/index.html
 
-COPY /vmupdown /var/www/html/
+COPY /vmupdown /var/www/html/vmupdown
 
 RUN rm -rf /var/www/html/vmupdown/config/config.py
 
