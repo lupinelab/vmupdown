@@ -5,7 +5,7 @@ vmupdown provides simple controls though an apache web site for Proxmox VMs & no
 
 It uses Proxmoxer (https://github.com/proxmoxer/proxmoxer) with a Flask frontend to monitor status and control powering on/off VMs or nodes. It also includes basic detection of conflicts in VFIO pcie devices shared between VMs.
 
-NB - Various assumptions on deployment platform are made in the below instructions, the below relates to Ubuntu 21.10.
+NB - Various assumptions on deployment platform are made in the below instructions, the below relates to Ubuntu.
 
 # Requirements:
 APT:
