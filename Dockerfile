@@ -18,4 +18,4 @@ RUN a2dissite 000-default && a2ensite vmupdown
 
 RUN ln -sf /proc/self/fd/1 /var/log/apache2/access.log && ln -sf /proc/self/fd/1 /var/log/apache2/error.log
 
-CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+ENTRYPOINT ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
