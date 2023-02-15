@@ -39,25 +39,37 @@ services:
 # Manual Deployment
 ## Requirements:
 APT:
-<br />apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
-<br />PIP:
-<br />flask proxmoxer requests
+```
+apt install apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
+```
+PIP:
+```
+pip install flask proxmoxer requests
+```
 
-## Installation:
-- Install requirements:
-<br />apt install apache2 libapache2-mod-wsgi-py3 wakeonlan python3-pip
-<br />pip3 install flask proxmoxer requests
-- Configure apache2 to listen on port 8080:
-<br />Add "Listen 8080" to /etc/apache2/ports.conf
+## Example Installation:
+- Configure apache2 to listen on port 8080 in /etc/apache2/ports.conf:
+```
+...
+Listen 8080
+...
+```
 
-- Copy vmupdown folder into /var/www/html and adjust permissions:<br />
-chown -R www-data:www-data /var/www/html/vmupdown<br />
+- Copy vmupdown folder into /var/www/html and adjust permissions:
+```
+cp -R vmupdown /var/www/html/
+chown -R www-data:www-data /var/www/html/vmupdown
 chmod +x /var/www/html/vmupdown/vmupdown.*
+```
 
 - Copy vmupdown.conf to /etc/apache2/sites-available and then enable site:
-<br />a2ensite vmupdown
+```
+a2ensite vmupdown
+```
 
 - Reload apache:
-<br />systemctl reload apache2
+```
+systemctl reload apache2
+```
 
 - You should now be able to load the site on http://serveripaddress:8080
