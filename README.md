@@ -38,10 +38,6 @@ services:
             - '$HOME/docker-containers/vmupdown/db:/var/www/html/vmupdown/db'
         restart: unless-stopped
         image: lupinelab/vmupdown
-
-volumes:
-  db:
-    name: vmupdown_db
 ```
 Create the db folder and set permissions. eg:
 ```
