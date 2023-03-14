@@ -34,15 +34,19 @@ services:
         ports:
             - '8080:80'
         volumes:
-            - '$HOME/docker-containers/vmupdown/config.py:/var/www/html/vmupdown/config/config.py'
-            - '$HOME/docker-containers/vmupdown/db:/var/www/html/vmupdown/db'
+            - '/path/to/vmupdown/config.py:/var/www/html/vmupdown/config/config.py'
+            - '/path/to/vmupdown/db:/var/www/html/vmupdown/db'
         restart: unless-stopped
         image: lupinelab/vmupdown
 ```
 Create the db folder and set permissions. eg:
 ```
-mkdir $HOME/docker-containers/vmupdown/db
-chown 33:33 $HOME/docker-containers/vmupdown/db
+mkdir /path/to/vmupdown/db
+chown 33:33 /path/to/vmupdown/db
+```
+Run the container:
+```
+docker-compose up -d
 ```
 
 # Manual Deployment
