@@ -1,9 +1,11 @@
 # vmupdown
-vmupdown provides simple controls though an apache web site for Proxmox VMs & nodes. Specifically for my use case which is using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
+A simple cweb gui Proxmox VMs & nodes. Specifically for the use case of using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
 
 ![screenshot-1](images/vmupdown-1.png)
 
 It uses a Flask and Proxmoxer (https://github.com/proxmoxer/proxmoxer) to monitor status and control powering on/off VMs or nodes. It also includes basic detection of conflicts in VFIO pcie devices shared between VMs.
+
+The default credentials are admin:admin. The password can be changed once logged in.
 
 NB - Various assumptions on deployment platform are made in the below instructions, the below relates to Ubuntu.
 
@@ -32,9 +34,16 @@ services:
         ports:
             - '8080:80'
         volumes:
-            - '/path/to/config.py:/var/www/html/vmupdown/config/config.py'
+            - '$HOME/docker-containers/vmupdown/config.py:/var/www/html/vmupdown/config/config.py'
+            - 'db:/var/www/html/vmupdown/db'
         restart: unless-stopped
         image: lupinelab/vmupdown
+        build:
+          context: ./
+
+volumes:
+  db:
+    name: vmupdown_db
 ```
 # Manual Deployment
 ## Requirements:

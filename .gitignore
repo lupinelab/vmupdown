@@ -1,4 +1,5 @@
 .gitignore
+docker-compose.yml
 Pipfile.lock
 vmupdown/__pycache__/
 vmupdown/config/__pycache__/

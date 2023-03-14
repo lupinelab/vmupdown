@@ -66,5 +66,8 @@ window.onload = timedRefresh(30000);
         {% endif %}
         {% endfor %}</p>
 </form>
+<a href="{{ url_for('set_password') }}">Change Password</a>
+<br>
+<a href="{{ url_for('logout') }}">Logout</a>
 </body>
 </html>

@@ -1,12 +1,38 @@
 from os import system
 from threading import Thread
 from time import sleep
-from flask import Flask, request, render_template, redirect, url_for, session
+from datetime import timedelta
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, render_template, redirect, url_for, session, flash
+from flask_login import UserMixin, LoginManager, login_required, current_user, login_user, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from proxmoxer import ProxmoxAPI
+import urllib3
 from config.config import token, nodes, sharedgpu 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tidnsdhm'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../db/vmupdown.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+
+db = SQLAlchemy(app)
+login = LoginManager()
+login.init_app(app)
+login.login_view = 'login'
+
+urllib3.disable_warnings()
+
+class Users(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(100))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class Host:
     def __init__(self, ip, mac, status = ""):
@@ -73,6 +99,16 @@ class Runningvm(Itemtoaction):
     pass
 
 
+def init():
+    with app.app_context():
+        db.create_all()
+        if not Users.query.filter_by(username='admin').first():
+            user = Users(username='admin')
+            user.set_password('admin')
+            db.session.add(user)
+            db.session.commit()
+
+
 def proxmoxer_connection(node):
     connection = ProxmoxAPI(node.ip, user="vmupdown@pam", token_name="vmupdown", token_value=token, verify_ssl=False)
     return connection
@@ -90,7 +126,7 @@ def checkvmstatus(vm):
 
 
 def checkhoststatus(ip):
-    ping = "ping " + ip + " -c 1 -W 2 >/dev/null"
+    ping = f"ping -c 1 -W 2 {ip} > /dev/null"
     if system(ping) == 0:
         return "started"
     else:
@@ -166,6 +202,7 @@ def vmdownup():
     sleep(5)
     itemtoaction.start()
 
+init()
 get_hosts()
 refreshvms()
 
@@ -175,7 +212,52 @@ thread.daemon = True
 thread.start()
 
 
+@login.user_loader
+def load_user(id):
+    return Users.query.get(int(id))
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'GET':
+        if session.get('user', None) != None:
+            return redirect(url_for('vmupdown'))
+        return render_template("login.html")
+    if request.method == 'POST':
+        username = request.form['username']
+        user = Users.query.filter_by(username=username).first()
+        if user is not None and user.check_password(request.form['password']):
+            login_user(user)
+            session['user'] = username
+            return redirect(url_for('vmupdown'))
+        flash('Incorrect username or password')
+        return render_template("login.html")
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    session.pop('user')
+    return redirect(url_for('vmupdown'))
+
+
+@app.route('/set_password', methods=['POST', 'GET'])
+@login_required
+def set_password():
+    if request.method == 'GET':
+        return render_template('set_password.html')
+    if request.method == 'POST':
+        if request.form.get('set_password'):
+            user = db.session.execute(db.select(Users)
+                                      .where(Users.username == 'admin')
+                                      ).scalar()
+            user.set_password(request.form['set_password']) 
+            db.session.commit()
+        return redirect(url_for('vmupdown'))
+
 @app.route('/refresh')
+@login_required
 def refresh():
     checkhoststates()
     refreshvms()
@@ -183,6 +265,7 @@ def refresh():
 
 
 @app.route('/', methods=["GET", "POST"])
+@login_required
 def vmupdown():
     if request.method == "POST":
         global itemtoaction, runningvm
@@ -226,6 +309,7 @@ def vmupdown():
 
 
 @app.route('/alreadystarted', methods=["GET", "POST"])
+@login_required
 def alreadystarted():
     if request.method == 'GET':
         return render_template('alreadystarted.html', itemtoaction=itemtoaction)
@@ -235,6 +319,7 @@ def alreadystarted():
 
 
 @app.route('/confirm', methods=["GET", "POST"])
+@login_required
 def confirm():
     if request.method == "POST":
         session['action'] = "started"
@@ -244,6 +329,7 @@ def confirm():
 
 
 @app.route('/pleasewait', methods=["GET", "POST"])
+@login_required
 def pleasewait():
     if request.method == 'GET':
         return render_template('pleasewait.html', runningvm=runningvm, itemtoaction=itemtoaction)
@@ -253,6 +339,7 @@ def pleasewait():
 
 
 @app.route('/starting', methods=["GET", "POST"])
+@login_required
 def starting():
     if request.method == 'GET':
         return render_template('starting.html', itemtoaction=itemtoaction)
@@ -262,6 +349,7 @@ def starting():
 
 
 @app.route('/shuttingdown', methods=["GET", "POST"])
+@login_required
 def shuttingdown():
     if request.method == 'GET':
         return render_template('shuttingdown.html', itemtoaction=itemtoaction)
@@ -271,6 +359,7 @@ def shuttingdown():
 
 
 @app.route('/done', methods=["GET", "POST"])
+@login_required
 def done():
     action = session.get('action', None)
     state = 1
@@ -317,5 +406,5 @@ def done():
         return 'done'
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+# if __name__ == "__main__":
+#     app.run(host="0.0.0.0", port=8080, debug=True)
