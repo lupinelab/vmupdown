@@ -4,7 +4,7 @@ from time import sleep
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, render_template, redirect, url_for, session, flash
-from flask_login import UserMixin, LoginManager, login_required, current_user, login_user, logout_user
+from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from proxmoxer import ProxmoxAPI
 import urllib3
@@ -344,8 +344,8 @@ def starting():
     if request.method == 'GET':
         return render_template('starting.html', itemtoaction=itemtoaction)
     if request.method == 'POST':
-            itemtoaction.start()
-            return 'done'
+        itemtoaction.start()
+        return 'done'
 
 
 @app.route('/shuttingdown', methods=["GET", "POST"])
@@ -406,5 +406,5 @@ def done():
         return 'done'
 
 
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=8080, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)

@@ -4,7 +4,7 @@ RUN apt-get -y update && apt-get install -y python3 libapache2-mod-wsgi-py3 wake
 
 COPY requirements.txt ./
 
-RUN pip3 install -r requirements.txt && rm requirements.txt
+RUN pip3 install -r requirements.txt --break-system-packages && rm requirements.txt 
 
 RUN rm /var/www/html/index.html
 
