@@ -1,5 +1,5 @@
 # vmupdown
-A simple cweb gui Proxmox VMs & nodes. Specifically for the use case of using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
+A simple web gui for controlling Proxmox VMs & nodes. Specifically for the use case of using a headless proxmox server as a workstation with multiple VMs sharing a single GPU and switching between them as required.
 
 ![screenshot-1](images/vmupdown-1.png)
 
@@ -32,7 +32,7 @@ services:
     vmupdown:
         container_name: vmupdown
         ports:
-            - '8080:80'
+            - '8080:8000'
         volumes:
             - '/path/to/vmupdown/config.py:/var/www/html/vmupdown/config/config.py'
             - '/path/to/vmupdown/db:/var/www/html/vmupdown/db'

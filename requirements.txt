@@ -7,12 +7,13 @@ flask==2.3.2 ; python_version >= '3.8'
 flask-login==0.6.2
 flask-sqlalchemy==3.0.3
 greenlet==2.0.2 ; platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))
+gunicorn ~= 20.1
 idna==3.4 ; python_version >= '3.5'
 itsdangerous==2.1.2 ; python_version >= '3.7'
 jinja2==3.1.2 ; python_version >= '3.7'
 markupsafe==2.1.2 ; python_version >= '3.7'
 proxmoxer==2.0.1
-requests==2.29.0
+requests==2.31.0
 sqlalchemy==2.0.12 ; python_version >= '3.7'
 typing-extensions==4.5.0 ; python_version >= '3.7'
 urllib3==1.26.15
