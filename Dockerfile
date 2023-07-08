@@ -4,6 +4,10 @@ RUN apk add awake
 
 RUN ln -s $(which awake) /usr/bin/wakeonlan
 
+RUN adduser -u 1000 -D vmupdown
+
+USER vmupdown
+
 WORKDIR /vmupdown
 
 COPY requirements.txt .
