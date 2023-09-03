@@ -214,7 +214,7 @@ thread.start()
 
 @login.user_loader
 def load_user(id):
-    return Users.query.get(int(id))
+    return db.session.get(Users, int(id))
 
 
 @app.route('/login', methods=['POST', 'GET'])
