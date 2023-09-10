@@ -1,0 +1,30 @@
+version: 2.1
+
+jobs:
+  docker_build_and_push:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Build image
+          command: docker build -t lupinelab/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG} -t lupinelab/${CIRCLE_PROJECT_REPONAME}:latest .
+      - run:
+          name: Login to registry
+          command: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+      - run:
+          name: Push image
+          command: docker push lupinelab/${CIRCLE_PROJECT_REPONAME} --all-tags
+
+workflows:
+  build_and_push:
+    jobs:
+      - docker_build_and_push:
+          context: dockerhub
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /\d+\.\d+\.\d+/
+              
