@@ -1,0 +1,8 @@
+# requirements.in
+flask
+gunicorn
+proxmoxer
+flask-login
+flask-sqlalchemy
+requests
+urllib3

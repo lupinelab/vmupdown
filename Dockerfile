@@ -8,9 +8,11 @@ RUN adduser -u 1000 -D vmupdown
 
 WORKDIR /vmupdown
 
+RUN pip3 install pip-tools
+
 COPY requirements.txt .
 
-RUN pip3 install -r requirements.txt
+RUN pip-sync
 
 COPY vmupdown/ .
 
